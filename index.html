@@ -3,437 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2026 롤러와 리그전 - 플레이오프 대진표</title>
+  <title>2026 롤러와 리그전 - 플레이오프 대진표 (실시간)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Pretendard:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-dark: #070913;
-      --panel-bg: rgba(15, 23, 42, 0.75);
-      --panel-border: rgba(255, 255, 255, 0.12);
-      
-      --baron-blue: #00d2ff;
-      --baron-glow: rgba(0, 210, 255, 0.4);
-      --elder-pink: #ff2a85;
-      --elder-glow: rgba(255, 42, 133, 0.4);
-      --gold-main: #f39c12;
-      --gold-glow: rgba(243, 156, 18, 0.5);
-      
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-    }
+  
+  <!-- Firebase SDK (v9) Import -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-    }
+    // Firebase 설정값 반영
+    const firebaseConfig = {
+      apiKey: "AIzaSyCz0ITodDtZaFg-60LZaF2blCpwJe7NpiI",
+      authDomain: "rollewaplayoff.firebaseapp.com",
+      projectId: "rollewaplayoff",
+      storageBucket: "rollewaplayoff.firebasestorage.app",
+      messagingSenderId: "962186215467",
+      appId: "1:962186215467:web:c9bcf068740883b9ecea6e",
+      measurementId: "G-QCNC68CB6G",
+      databaseURL: "https://rollewaplayoff-default-rtdb.firebaseio.com"
+    };
 
-    body {
-      background-color: var(--bg-dark);
-      background-image: 
-        radial-gradient(circle at 10% 20%, rgba(0, 210, 255, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 90% 20%, rgba(255, 42, 133, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 50% 80%, rgba(243, 156, 18, 0.1) 0%, transparent 50%);
-      color: var(--text-main);
-      font-family: 'Pretendard', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-    }
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const dbRef = ref(db, 'playoff_bracket');
 
-    /* Top Control Bar */
-    .top-bar {
-      width: 100%;
-      max-width: 1200px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      background: var(--panel-bg);
-      border: 1px solid var(--panel-border);
-      padding: 12px 20px;
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .admin-status {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.95rem;
-      font-weight: 600;
-    }
-
-    .status-badge {
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 700;
-    }
-    .status-badge.viewer { background: rgba(148, 163, 184, 0.2); color: var(--text-muted); }
-    .status-badge.admin { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #4ade80; }
-
-    .btn-group {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    button {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid var(--panel-border);
-      color: var(--text-main);
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    button:hover {
-      background: rgba(255, 255, 255, 0.18);
-      transform: translateY(-1px);
-    }
-
-    button.btn-primary {
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-      border: none;
-    }
-    button.btn-primary:hover {
-      background: linear-gradient(135deg, #60a5fa, #3b82f6);
-    }
-
-    /* Header Title */
-    .header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .header-sub {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.2rem;
-      letter-spacing: 4px;
-      color: var(--gold-main);
-      text-shadow: 0 0 10px var(--gold-glow);
-    }
-
-    .header-title {
-      font-size: 2.8rem;
-      font-weight: 900;
-      background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
-      margin-top: 4px;
-    }
-
-    /* Bracket Container */
-    .bracket-wrapper {
-      width: 100%;
-      max-width: 1200px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 20px;
-      position: relative;
-      padding: 20px 0;
-    }
-
-    .bracket-column {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      flex: 1;
-      max-width: 280px;
-    }
-
-    .column-title {
-      text-align: center;
-      font-size: 0.9rem;
-      font-weight: 800;
-      letter-spacing: 1px;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-    }
-
-    .baron-theme { color: var(--baron-blue); text-shadow: 0 0 8px var(--baron-glow); }
-    .elder-theme { color: var(--elder-pink); text-shadow: 0 0 8px var(--elder-glow); }
-    .gold-theme { color: var(--gold-main); text-shadow: 0 0 10px var(--gold-glow); }
-
-    /* Match Card */
-    .match-card {
-      background: var(--panel-bg);
-      border: 1px solid var(--panel-border);
-      border-radius: 12px;
-      padding: 14px;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      position: relative;
-      transition: all 0.3s ease;
-    }
-
-    .match-card:hover {
-      border-color: rgba(255, 255, 255, 0.25);
-    }
-
-    .card-label {
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .team-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: 1px solid transparent;
-      transition: all 0.2s;
-    }
-
-    .team-row.winner {
-      border-color: var(--gold-main);
-      background: rgba(243, 156, 18, 0.15);
-    }
-
-    .team-name-input {
-      background: transparent;
-      border: none;
-      color: var(--text-main);
-      font-weight: 700;
-      font-size: 0.95rem;
-      width: 100%;
-      outline: none;
-    }
-
-    .team-name-input:read-only {
-      cursor: default;
-    }
-
-    .score-input {
-      width: 36px;
-      height: 28px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid var(--panel-border);
-      color: #fff;
-      text-align: center;
-      border-radius: 4px;
-      font-weight: 800;
-      font-size: 0.9rem;
-      outline: none;
-    }
-
-    .score-input:read-only {
-      background: transparent;
-      border: none;
-    }
-
-    .win-btn {
-      padding: 2px 6px;
-      font-size: 0.7rem;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid var(--panel-border);
-      color: var(--text-muted);
-      cursor: pointer;
-      display: none;
-    }
-
-    .admin-active .win-btn {
-      display: inline-block;
-    }
-
-    .win-btn.active {
-      background: var(--gold-main);
-      color: #000;
-      font-weight: 800;
-      border: none;
-    }
-
-    /* Champion Box */
-    .champion-box {
-      background: linear-gradient(135deg, rgba(243, 156, 18, 0.2), rgba(0,0,0,0.6));
-      border: 2px solid var(--gold-main);
-      box-shadow: 0 0 25px var(--gold-glow);
-      text-align: center;
-      padding: 20px;
-      border-radius: 16px;
-    }
-
-    .champion-title {
-      font-size: 1rem;
-      font-weight: 800;
-      color: var(--gold-main);
-      margin-bottom: 10px;
-    }
-
-    .champion-name {
-      font-size: 1.6rem;
-      font-weight: 900;
-      color: #fff;
-      min-height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* Responsive */
-    @media (max-width: 900px) {
-      .bracket-wrapper {
-        flex-direction: column;
-      }
-      .bracket-column {
-        width: 100%;
-        max-width: 100%;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Top Bar -->
-  <div class="top-bar">
-    <div class="admin-status">
-      <span>권한:</span>
-      <span id="statusBadge" class="status-badge viewer">일반 시청자 (수정 불가)</span>
-    </div>
-    <div class="btn-group">
-      <button id="authBtn" onclick="toggleAuth()">관리자 로그인</button>
-      <button onclick="copySummary()">카톡 요약 복사</button>
-      <button onclick="exportJSON()">JSON 백업</button>
-      <button onclick="importJSON()">JSON 복원</button>
-      <button onclick="resetData()" style="color: #ef4444;">초기화</button>
-    </div>
-  </div>
-
-  <!-- Header -->
-  <div class="header">
-    <div class="header-sub">2026 ROLLEWA LEAGUE</div>
-    <div class="header-title">PLAYOFF BRACKET</div>
-  </div>
-
-  <!-- Bracket Grid -->
-  <div class="bracket-wrapper" id="bracketWrapper">
-    
-    <!-- 8강/시드 진출팀 -->
-    <div class="bracket-column">
-      <div class="column-title baron-theme">바론 진출팀</div>
-      
-      <div class="match-card">
-        <div class="card-label">바론 1위</div>
-        <div class="team-row" id="row-b1">
-          <input type="text" class="team-name-input" id="team-b1" value="바론 1위 팀" onchange="saveData()">
-        </div>
-      </div>
-
-      <div class="match-card">
-        <div class="card-label">바론 2위</div>
-        <div class="team-row" id="row-b2">
-          <input type="text" class="team-name-input" id="team-b2" value="바론 2위 팀" onchange="saveData()">
-        </div>
-      </div>
-
-      <div class="column-title elder-theme" style="margin-top: 20px;">장로 진출팀</div>
-
-      <div class="match-card">
-        <div class="card-label">장로 1위</div>
-        <div class="team-row" id="row-e1">
-          <input type="text" class="team-name-input" id="team-e1" value="장로 1위 팀" onchange="saveData()">
-        </div>
-      </div>
-
-      <div class="match-card">
-        <div class="card-label">장로 2위</div>
-        <div class="team-row" id="row-e2">
-          <input type="text" class="team-name-input" id="team-e2" value="장로 2위 팀" onchange="saveData()">
-        </div>
-      </div>
-    </div>
-
-    <!-- 준결승 (4강) -->
-    <div class="bracket-column">
-      <div class="column-title gold-theme">준결승 (4강)</div>
-
-      <!-- 준결승 1경기 -->
-      <div class="match-card">
-        <div class="card-label">준결승 1경기 (바론1 vs 장로2)</div>
-        <div class="team-row" id="row-sf1-1">
-          <input type="text" class="team-name-input" id="team-sf1-1" readonly placeholder="바론 1위">
-          <input type="number" class="score-input" id="score-sf1-1" value="0" onchange="saveData()">
-          <button class="win-btn" id="win-sf1-1" onclick="setWinner('sf1', 1)">승리</button>
-        </div>
-        <div class="team-row" id="row-sf1-2">
-          <input type="text" class="team-name-input" id="team-sf1-2" readonly placeholder="장로 2위">
-          <input type="number" class="score-input" id="score-sf1-2" value="0" onchange="saveData()">
-          <button class="win-btn" id="win-sf1-2" onclick="setWinner('sf1', 2)">승리</button>
-        </div>
-      </div>
-
-      <!-- 준결승 2경기 -->
-      <div class="match-card">
-        <div class="card-label">준결승 2경기 (바론2 vs 장로1)</div>
-        <div class="team-row" id="row-sf2-1">
-          <input type="text" class="team-name-input" id="team-sf2-1" readonly placeholder="바론 2위">
-          <input type="number" class="score-input" id="score-sf2-1" value="0" onchange="saveData()">
-          <button class="win-btn" id="win-sf2-1" onclick="setWinner('sf2', 1)">승리</button>
-        </div>
-        <div class="team-row" id="row-sf2-2">
-          <input type="text" class="team-name-input" id="team-sf2-2" readonly placeholder="장로 1위">
-          <input type="number" class="score-input" id="score-sf2-2" value="0" onchange="saveData()">
-          <button class="win-btn" id="win-sf2-2" onclick="setWinner('sf2', 2)">승리</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 결승 및 우승 -->
-    <div class="bracket-column">
-      <div class="column-title gold-theme">결승전</div>
-
-      <div class="match-card">
-        <div class="card-label">FINAL MATCH</div>
-        <div class="team-row" id="row-f-1">
-          <input type="text" class="team-name-input" id="team-f-1" readonly placeholder="준결승 1경기 승자">
-          <input type="number" class="score-input" id="score-f-1" value="0" onchange="saveData()">
-          <button class="win-btn" id="win-f-1" onclick="setWinner('f', 1)">승리</button>
-        </div>
-        <div class="team-row" id="row-f-2">
-          <input type="text" class="team-name-input" id="team-f-2" readonly placeholder="준결승 2경기 승자">
-          <input type="number" class="score-input" id="score-f-2" value="0" onchange="saveData()">
-          <button class="win-btn" id="win-f-2" onclick="setWinner('f', 2)">승리</button>
-        </div>
-      </div>
-
-      <!-- 우승팀 -->
-      <div class="champion-box">
-        <div class="champion-title">🏆 WINNER 🏆</div>
-        <div class="champion-name" id="championName">대기 중</div>
-      </div>
-    </div>
-
-  </div>
-
-  <script>
-    const ADMIN_PW = "1104"; // 비밀번호가 1104로 설정되었습니다.
+    const ADMIN_PW = "1104";
     let isAdmin = false;
-
-    // 데이터 저장 키
-    const STORAGE_KEY = "rollewa_playoff_data";
 
     let bracketData = {
       b1: "바론 1위 팀",
@@ -445,12 +42,16 @@
       f_score1: 0, f_score2: 0, f_winner: 0
     };
 
-    window.onload = () => {
-      loadData();
-      render();
-    };
+    // 실시간 데이터 수신 (모든 사용자 화면 자동 업데이트)
+    onValue(dbRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        bracketData = data;
+        render();
+      }
+    });
 
-    function toggleAuth() {
+    window.toggleAuth = function() {
       if (isAdmin) {
         isAdmin = false;
         alert("로그아웃 되었습니다.");
@@ -458,33 +59,61 @@
         const pw = prompt("관리자 비밀번호를 입력하세요:");
         if (pw === ADMIN_PW) {
           isAdmin = true;
-          alert("관리자로 인증되었습니다.");
+          alert("관리자로 인증되었습니다. (수정 모드)");
         } else if (pw !== null) {
           alert("비밀번호가 일치하지 않습니다.");
         }
       }
       render();
-    }
+    };
+
+    window.setWinner = function(match, winner) {
+      if (!isAdmin) return;
+      if (bracketData[`${match}_winner`] === winner) {
+        bracketData[`${match}_winner`] = 0;
+      } else {
+        bracketData[`${match}_winner`] = winner;
+      }
+      saveData();
+    };
+
+    window.saveData = function() {
+      if (!isAdmin) return;
+
+      bracketData.b1 = document.getElementById("team-b1").value;
+      bracketData.b2 = document.getElementById("team-b2").value;
+      bracketData.e1 = document.getElementById("team-e1").value;
+      bracketData.e2 = document.getElementById("team-e2").value;
+
+      bracketData.sf1_score1 = parseInt(document.getElementById("score-sf1-1").value) || 0;
+      bracketData.sf1_score2 = parseInt(document.getElementById("score-sf1-2").value) || 0;
+      bracketData.sf2_score1 = parseInt(document.getElementById("score-sf2-1").value) || 0;
+      bracketData.sf2_score2 = parseInt(document.getElementById("score-sf2-2").value) || 0;
+
+      bracketData.f_score1 = parseInt(document.getElementById("score-f-1").value) || 0;
+      bracketData.f_score2 = parseInt(document.getElementById("score-f-2").value) || 0;
+
+      // Firebase 데이터베이스에 즉시 업로드 (실시간 동기화)
+      set(dbRef, bracketData);
+    };
 
     function render() {
-      // 권한 표기
       const badge = document.getElementById("statusBadge");
       const authBtn = document.getElementById("authBtn");
       const wrapper = document.getElementById("bracketWrapper");
 
       if (isAdmin) {
-        badge.innerText = "관리자 모드 (수정 가능)";
+        badge.innerText = "관리자 모드 (실시간 수정 가능)";
         badge.className = "status-badge admin";
         authBtn.innerText = "로그아웃";
         wrapper.classList.add("admin-active");
       } else {
-        badge.innerText = "일반 시청자 (수정 불가)";
+        badge.innerText = "일반 시청자 (실시간 관람 중)";
         badge.className = "status-badge viewer";
         authBtn.innerText = "관리자 로그인";
         wrapper.classList.remove("admin-active");
       }
 
-      // Input Readonly 제어
       document.getElementById("team-b1").readOnly = !isAdmin;
       document.getElementById("team-b2").readOnly = !isAdmin;
       document.getElementById("team-e1").readOnly = !isAdmin;
@@ -494,29 +123,26 @@
         input.readOnly = !isAdmin;
       });
 
-      // 데이터 대입
-      document.getElementById("team-b1").value = bracketData.b1;
-      document.getElementById("team-b2").value = bracketData.b2;
-      document.getElementById("team-e1").value = bracketData.e1;
-      document.getElementById("team-e2").value = bracketData.e2;
+      document.getElementById("team-b1").value = bracketData.b1 || "";
+      document.getElementById("team-b2").value = bracketData.b2 || "";
+      document.getElementById("team-e1").value = bracketData.e1 || "";
+      document.getElementById("team-e2").value = bracketData.e2 || "";
 
-      // 준결승 팀 연결
-      const sf1_1 = bracketData.b1;
-      const sf1_2 = bracketData.e2;
-      const sf2_1 = bracketData.b2;
-      const sf2_2 = bracketData.e1;
+      const sf1_1 = bracketData.b1 || "바론 1위";
+      const sf1_2 = bracketData.e2 || "장로 2위";
+      const sf2_1 = bracketData.b2 || "바론 2위";
+      const sf2_2 = bracketData.e1 || "장로 1위";
 
       document.getElementById("team-sf1-1").value = sf1_1;
       document.getElementById("team-sf1-2").value = sf1_2;
       document.getElementById("team-sf2-1").value = sf2_1;
       document.getElementById("team-sf2-2").value = sf2_2;
 
-      document.getElementById("score-sf1-1").value = bracketData.sf1_score1;
-      document.getElementById("score-sf1-2").value = bracketData.sf1_score2;
-      document.getElementById("score-sf2-1").value = bracketData.sf2_score1;
-      document.getElementById("score-sf2-2").value = bracketData.sf2_score2;
+      document.getElementById("score-sf1-1").value = bracketData.sf1_score1 || 0;
+      document.getElementById("score-sf1-2").value = bracketData.sf1_score2 || 0;
+      document.getElementById("score-sf2-1").value = bracketData.sf2_score1 || 0;
+      document.getElementById("score-sf2-2").value = bracketData.sf2_score2 || 0;
 
-      // 준결승 승자 판정
       let f_1 = "준결승 1경기 승자";
       if (bracketData.sf1_winner === 1) f_1 = sf1_1;
       else if (bracketData.sf1_winner === 2) f_1 = sf1_2;
@@ -528,15 +154,13 @@
       document.getElementById("team-f-1").value = f_1;
       document.getElementById("team-f-2").value = f_2;
 
-      document.getElementById("score-f-1").value = bracketData.f_score1;
-      document.getElementById("score-f-2").value = bracketData.f_score2;
+      document.getElementById("score-f-1").value = bracketData.f_score1 || 0;
+      document.getElementById("score-f-2").value = bracketData.f_score2 || 0;
 
-      // 승리 버튼 클래스 적용
       updateWinnerUI('sf1', bracketData.sf1_winner);
       updateWinnerUI('sf2', bracketData.sf2_winner);
       updateWinnerUI('f', bracketData.f_winner);
 
-      // 우승팀 판정
       const champBox = document.getElementById("championName");
       if (bracketData.f_winner === 1 && f_1 !== "준결승 1경기 승자") {
         champBox.innerText = f_1;
@@ -559,60 +183,7 @@
       if (row2) row2.classList.toggle("winner", winner === 2);
     }
 
-    function setWinner(match, winner) {
-      if (!isAdmin) return;
-      if (bracketData[`${match}_winner`] === winner) {
-        bracketData[`${match}_winner`] = 0; // 취소
-      } else {
-        bracketData[`${match}_winner`] = winner;
-      }
-      saveData();
-      render();
-    }
-
-    function saveData() {
-      if (isAdmin) {
-        bracketData.b1 = document.getElementById("team-b1").value;
-        bracketData.b2 = document.getElementById("team-b2").value;
-        bracketData.e1 = document.getElementById("team-e1").value;
-        bracketData.e2 = document.getElementById("team-e2").value;
-
-        bracketData.sf1_score1 = parseInt(document.getElementById("score-sf1-1").value) || 0;
-        bracketData.sf1_score2 = parseInt(document.getElementById("score-sf1-2").value) || 0;
-        bracketData.sf2_score1 = parseInt(document.getElementById("score-sf2-1").value) || 0;
-        bracketData.sf2_score2 = parseInt(document.getElementById("score-sf2-2").value) || 0;
-
-        bracketData.f_score1 = parseInt(document.getElementById("score-f-1").value) || 0;
-        bracketData.f_score2 = parseInt(document.getElementById("score-f-2").value) || 0;
-      }
-
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(bracketData));
-      render();
-    }
-
-    function loadData() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try {
-          bracketData = JSON.parse(saved);
-        } catch (e) {
-          console.error("데이터 로드 실패", e);
-        }
-      }
-    }
-
-    function resetData() {
-      if (!isAdmin) {
-        alert("관리자 권한이 필요합니다.");
-        return;
-      }
-      if (confirm("모든 플레이오프 데이터를 초기화하시겠습니까?")) {
-        localStorage.removeItem(STORAGE_KEY);
-        location.reload();
-      }
-    }
-
-    function copySummary() {
+    window.copySummary = function() {
       const text = `🏆 [2026 롤러와 리그전 플레이오프 현황]
 
 ⚔️ 준결승 1경기
@@ -627,45 +198,216 @@
 👑 최종 우승: ${document.getElementById("championName").innerText}`;
 
       navigator.clipboard.writeText(text).then(() => {
-        alert("카카오톡 공유용 요약 텍스트가 클립보드에 복사되었습니다!");
+        alert("카카오톡 공유용 요약 텍스트가 복사되었습니다!");
       });
-    }
-
-    function exportJSON() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(bracketData, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", "rollewa_playoff_data.json");
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    }
-
-    function importJSON() {
-      if (!isAdmin) {
-        alert("관리자 권한이 필요합니다.");
-        return;
-      }
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'application/json';
-      input.onchange = e => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.readAsText(file, 'UTF-8');
-        reader.onload = readerEvent => {
-          try {
-            const content = readerEvent.target.result;
-            bracketData = JSON.parse(content);
-            saveData();
-            alert("데이터를 성공적으로 불러왔습니다.");
-          } catch (err) {
-            alert("올바르지 않은 JSON 파일입니다.");
-          }
-        }
-      }
-      input.click();
-    }
+    };
   </script>
+
+  <style>
+    :root {
+      --bg-dark: #070913;
+      --panel-bg: rgba(15, 23, 42, 0.75);
+      --panel-border: rgba(255, 255, 255, 0.12);
+      --baron-blue: #00d2ff;
+      --baron-glow: rgba(0, 210, 255, 0.4);
+      --elder-pink: #ff2a85;
+      --elder-glow: rgba(255, 42, 133, 0.4);
+      --gold-main: #f39c12;
+      --gold-glow: rgba(243, 156, 18, 0.5);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(0, 210, 255, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 20%, rgba(255, 42, 133, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 50% 80%, rgba(243, 156, 18, 0.1) 0%, transparent 50%);
+      color: var(--text-main);
+      font-family: 'Pretendard', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .top-bar {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      padding: 12px 20px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .admin-status { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; font-weight: 600; }
+    .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+    .status-badge.viewer { background: rgba(148, 163, 184, 0.2); color: var(--text-muted); }
+    .status-badge.admin { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #4ade80; }
+
+    button {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--panel-border);
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    button:hover { background: rgba(255, 255, 255, 0.18); transform: translateY(-1px); }
+
+    .header { text-align: center; margin-bottom: 30px; }
+    .header-sub { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; letter-spacing: 4px; color: var(--gold-main); text-shadow: 0 0 10px var(--gold-glow); }
+    .header-title { font-size: 2.8rem; font-weight: 900; background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8); margin-top: 4px; }
+
+    .bracket-wrapper { width: 100%; max-width: 1200px; display: flex; justify-content: center; align-items: center; gap: 20px; padding: 20px 0; }
+    .bracket-column { display: flex; flex-direction: column; gap: 24px; flex: 1; max-width: 280px; }
+    .column-title { text-align: center; font-size: 0.9rem; font-weight: 800; letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase; }
+
+    .baron-theme { color: var(--baron-blue); text-shadow: 0 0 8px var(--baron-glow); }
+    .elder-theme { color: var(--elder-pink); text-shadow: 0 0 8px var(--elder-glow); }
+    .gold-theme { color: var(--gold-main); text-shadow: 0 0 10px var(--gold-glow); }
+
+    .match-card { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 12px; padding: 14px; backdrop-filter: blur(8px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); display: flex; flex-direction: column; gap: 10px; }
+    .card-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+    .team-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.3); padding: 8px 12px; border-radius: 8px; border: 1px solid transparent; }
+    .team-row.winner { border-color: var(--gold-main); background: rgba(243, 156, 18, 0.15); }
+
+    .team-name-input { background: transparent; border: none; color: var(--text-main); font-weight: 700; font-size: 0.95rem; width: 100%; outline: none; }
+    .team-name-input:read-only { cursor: default; }
+
+    .score-input { width: 36px; height: 28px; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--panel-border); color: #fff; text-align: center; border-radius: 4px; font-weight: 800; font-size: 0.9rem; outline: none; }
+    .score-input:read-only { background: transparent; border: none; }
+
+    .win-btn { padding: 2px 6px; font-size: 0.7rem; border-radius: 4px; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--panel-border); color: var(--text-muted); cursor: pointer; display: none; }
+    .admin-active .win-btn { display: inline-block; }
+    .win-btn.active { background: var(--gold-main); color: #000; font-weight: 800; border: none; }
+
+    .champion-box { background: linear-gradient(135deg, rgba(243, 156, 18, 0.2), rgba(0,0,0,0.6)); border: 2px solid var(--gold-main); box-shadow: 0 0 25px var(--gold-glow); text-align: center; padding: 20px; border-radius: 16px; }
+    .champion-title { font-size: 1rem; font-weight: 800; color: var(--gold-main); margin-bottom: 10px; }
+    .champion-name { font-size: 1.6rem; font-weight: 900; color: #fff; min-height: 40px; display: flex; align-items: center; justify-content: center; }
+
+    @media (max-width: 900px) {
+      .bracket-wrapper { flex-direction: column; }
+      .bracket-column { width: 100%; max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <div class="admin-status">
+      <span>상태:</span>
+      <span id="statusBadge" class="status-badge viewer">일반 시청자 (실시간 관람 중)</span>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button id="authBtn" onclick="toggleAuth()">관리자 로그인</button>
+      <button onclick="copySummary()">카톡 요약 복사</button>
+    </div>
+  </div>
+
+  <div class="header">
+    <div class="header-sub">2026 ROLLEWA LEAGUE</div>
+    <div class="header-title">PLAYOFF BRACKET</div>
+  </div>
+
+  <div class="bracket-wrapper" id="bracketWrapper">
+    <div class="bracket-column">
+      <div class="column-title baron-theme">바론 진출팀</div>
+      <div class="match-card">
+        <div class="card-label">바론 1위</div>
+        <div class="team-row" id="row-b1">
+          <input type="text" class="team-name-input" id="team-b1" value="바론 1위 팀" onchange="saveData()">
+        </div>
+      </div>
+      <div class="match-card">
+        <div class="card-label">바론 2위</div>
+        <div class="team-row" id="row-b2">
+          <input type="text" class="team-name-input" id="team-b2" value="바론 2위 팀" onchange="saveData()">
+        </div>
+      </div>
+
+      <div class="column-title elder-theme" style="margin-top: 20px;">장로 진출팀</div>
+      <div class="match-card">
+        <div class="card-label">장로 1위</div>
+        <div class="team-row" id="row-e1">
+          <input type="text" class="team-name-input" id="team-e1" value="장로 1위 팀" onchange="saveData()">
+        </div>
+      </div>
+      <div class="match-card">
+        <div class="card-label">장로 2위</div>
+        <div class="team-row" id="row-e2">
+          <input type="text" class="team-name-input" id="team-e2" value="장로 2위 팀" onchange="saveData()">
+        </div>
+      </div>
+    </div>
+
+    <div class="bracket-column">
+      <div class="column-title gold-theme">준결승 (4강)</div>
+      <div class="match-card">
+        <div class="card-label">준결승 1경기</div>
+        <div class="team-row" id="row-sf1-1">
+          <input type="text" class="team-name-input" id="team-sf1-1" readonly>
+          <input type="number" class="score-input" id="score-sf1-1" value="0" onchange="saveData()">
+          <button class="win-btn" id="win-sf1-1" onclick="setWinner('sf1', 1)">승리</button>
+        </div>
+        <div class="team-row" id="row-sf1-2">
+          <input type="text" class="team-name-input" id="team-sf1-2" readonly>
+          <input type="number" class="score-input" id="score-sf1-2" value="0" onchange="saveData()">
+          <button class="win-btn" id="win-sf1-2" onclick="setWinner('sf1', 2)">승리</button>
+        </div>
+      </div>
+
+      <div class="match-card">
+        <div class="card-label">준결승 2경기</div>
+        <div class="team-row" id="row-sf2-1">
+          <input type="text" class="team-name-input" id="team-sf2-1" readonly>
+          <input type="number" class="score-input" id="score-sf2-1" value="0" onchange="saveData()">
+          <button class="win-btn" id="win-sf2-1" onclick="setWinner('sf2', 1)">승리</button>
+        </div>
+        <div class="team-row" id="row-sf2-2">
+          <input type="text" class="team-name-input" id="team-sf2-2" readonly>
+          <input type="number" class="score-input" id="score-sf2-2" value="0" onchange="saveData()">
+          <button class="win-btn" id="win-sf2-2" onclick="setWinner('sf2', 2)">승리</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bracket-column">
+      <div class="column-title gold-theme">결승전</div>
+      <div class="match-card">
+        <div class="card-label">FINAL MATCH</div>
+        <div class="team-row" id="row-f-1">
+          <input type="text" class="team-name-input" id="team-f-1" readonly>
+          <input type="number" class="score-input" id="score-f-1" value="0" onchange="saveData()">
+          <button class="win-btn" id="win-f-1" onclick="setWinner('f', 1)">승리</button>
+        </div>
+        <div class="team-row" id="row-f-2">
+          <input type="text" class="team-name-input" id="team-f-2" readonly>
+          <input type="number" class="score-input" id="score-f-2" value="0" onchange="saveData()">
+          <button class="win-btn" id="win-f-2" onclick="setWinner('f', 2)">승리</button>
+        </div>
+      </div>
+
+      <div class="champion-box">
+        <div class="champion-title">🏆 WINNER 🏆</div>
+        <div class="champion-name" id="championName">대기 중</div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
