@@ -6,7 +6,7 @@
   <title>2026 롤러와 리그전 - 플레이오프 대진표 (실시간)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Pretendard:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Pretendard:wght@500;700;800;900&display=swap" rel="stylesheet">
   
   <!-- Firebase SDK (v9) Import -->
   <script type="module">
@@ -108,12 +108,12 @@
       const wrapper = document.getElementById("bracketWrapper");
 
       if (isAdmin) {
-        badge.innerText = "관리자 모드 (실시간 수정 가능)";
+        badge.innerText = "관리자 모드 (수정 가능)";
         badge.className = "status-badge admin";
         authBtn.innerText = "로그아웃";
         wrapper.classList.add("admin-active");
       } else {
-        badge.innerText = "일반 시청자 (실시간 관람 중)";
+        badge.innerText = "일반 관람 모드 (실시간 연동 중)";
         badge.className = "status-badge viewer";
         authBtn.innerText = "관리자 로그인";
         wrapper.classList.remove("admin-active");
@@ -218,17 +218,19 @@
 
   <style>
     :root {
-      --bg-dark: #070913;
-      --panel-bg: rgba(15, 23, 42, 0.75);
-      --panel-border: rgba(255, 255, 255, 0.12);
+      --bg-dark: #030611;
+      --panel-bg: rgba(13, 20, 38, 0.85);
+      --panel-border: rgba(255, 255, 255, 0.15);
+      
       --baron-blue: #00d2ff;
-      --baron-glow: rgba(0, 210, 255, 0.4);
+      --baron-glow: rgba(0, 210, 255, 0.6);
       --elder-pink: #ff2a85;
-      --elder-glow: rgba(255, 42, 133, 0.4);
-      --gold-main: #f39c12;
-      --gold-glow: rgba(243, 156, 18, 0.5);
+      --elder-glow: rgba(255, 42, 133, 0.6);
+      --gold-main: #f59e0b;
+      --gold-glow: rgba(245, 158, 11, 0.7);
+      
       --text-main: #f8fafc;
-      --text-muted: #94a3b8;
+      --text-muted: #cbd5e1;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
@@ -236,104 +238,241 @@
     body {
       background-color: var(--bg-dark);
       background-image: 
-        radial-gradient(circle at 10% 20%, rgba(0, 210, 255, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 90% 20%, rgba(255, 42, 133, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 50% 80%, rgba(243, 156, 18, 0.1) 0%, transparent 50%);
+        radial-gradient(circle at 15% 15%, rgba(0, 210, 255, 0.22) 0%, transparent 45%),
+        radial-gradient(circle at 85% 15%, rgba(255, 42, 133, 0.22) 0%, transparent 45%),
+        radial-gradient(circle at 50% 85%, rgba(245, 158, 11, 0.18) 0%, transparent 55%);
       color: var(--text-main);
       font-family: 'Pretendard', sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px;
+      padding: 30px 15px;
     }
 
+    /* Top Bar */
     .top-bar {
       width: 100%;
-      max-width: 1200px;
+      max-width: 1300px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
       background: var(--panel-bg);
       border: 1px solid var(--panel-border);
-      padding: 12px 20px;
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
+      padding: 16px 24px;
+      border-radius: 16px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 16px;
     }
 
-    .admin-status { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; font-weight: 600; }
-    .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
-    .status-badge.viewer { background: rgba(148, 163, 184, 0.2); color: var(--text-muted); }
-    .status-badge.admin { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #4ade80; }
+    .admin-status { display: flex; align-items: center; gap: 12px; font-size: 1.05rem; font-weight: 700; }
+    .status-badge { padding: 6px 14px; border-radius: 30px; font-size: 0.9rem; font-weight: 800; }
+    .status-badge.viewer { background: rgba(148, 163, 184, 0.25); color: var(--text-muted); border: 1px solid rgba(255, 255, 255, 0.1); }
+    .status-badge.admin { background: rgba(34, 197, 94, 0.25); color: #4ade80; border: 1px solid #4ade80; text-shadow: 0 0 10px rgba(74, 222, 128, 0.5); }
 
     button {
-      background: rgba(255, 255, 255, 0.08);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
       border: 1px solid var(--panel-border);
       color: var(--text-main);
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 0.85rem;
+      padding: 10px 22px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.25 ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
-    button:hover { background: rgba(255, 255, 255, 0.18); transform: translateY(-1px); }
+    button:hover { 
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.1));
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
 
-    .header { text-align: center; margin-bottom: 30px; }
-    .header-sub { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; letter-spacing: 4px; color: var(--gold-main); text-shadow: 0 0 10px var(--gold-glow); }
-    .header-title { font-size: 2.8rem; font-weight: 900; background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8); margin-top: 4px; }
+    /* Header Title */
+    .header { text-align: center; margin-bottom: 40px; }
+    .header-sub { 
+      font-family: 'Orbitron', sans-serif; 
+      font-size: 1.5rem; 
+      letter-spacing: 6px; 
+      color: var(--gold-main); 
+      text-shadow: 0 0 15px var(--gold-glow);
+      font-weight: 900;
+    }
+    .header-title { 
+      font-size: 3.5rem; 
+      font-weight: 900; 
+      background: linear-gradient(180deg, #ffffff 30%, #94a3b8 100%); 
+      -webkit-background-clip: text; 
+      -webkit-text-fill-color: transparent; 
+      text-shadow: 0 10px 30px rgba(0, 0, 0, 0.9); 
+      margin-top: 6px; 
+      letter-spacing: 2px;
+    }
 
-    .bracket-wrapper { width: 100%; max-width: 1200px; display: flex; justify-content: center; align-items: flex-start; gap: 20px; padding: 20px 0; }
-    .bracket-column { display: flex; flex-direction: column; gap: 24px; flex: 1; max-width: 280px; }
-    .column-title { text-align: center; font-size: 0.9rem; font-weight: 800; letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase; }
+    /* Bracket Layout */
+    .bracket-wrapper { 
+      width: 100%; 
+      max-width: 1300px; 
+      display: flex; 
+      justify-content: center; 
+      align-items: flex-start; 
+      gap: 30px; 
+      padding: 10px 0; 
+    }
+    .bracket-column { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 28px; 
+      flex: 1; 
+      max-width: 380px; 
+    }
 
-    .baron-theme { color: var(--baron-blue); text-shadow: 0 0 8px var(--baron-glow); }
-    .elder-theme { color: var(--elder-pink); text-shadow: 0 0 8px var(--elder-glow); }
-    .gold-theme { color: var(--gold-main); text-shadow: 0 0 10px var(--gold-glow); }
+    .column-title { 
+      text-align: center; 
+      font-size: 1.25rem; 
+      font-weight: 900; 
+      letter-spacing: 2px; 
+      margin-bottom: 6px; 
+      padding: 8px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
 
-    .match-card { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 12px; padding: 14px; backdrop-filter: blur(8px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); display: flex; flex-direction: column; gap: 10px; }
-    .card-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+    .baron-theme { color: var(--baron-blue); text-shadow: 0 0 12px var(--baron-glow); border-color: rgba(0, 210, 255, 0.3); }
+    .elder-theme { color: var(--elder-pink); text-shadow: 0 0 12px var(--elder-glow); border-color: rgba(255, 42, 133, 0.3); }
+    .gold-theme { color: var(--gold-main); text-shadow: 0 0 15px var(--gold-glow); border-color: rgba(245, 158, 11, 0.3); }
+
+    /* Match Card Expansion */
+    .match-card { 
+      background: var(--panel-bg); 
+      border: 2px solid var(--panel-border); 
+      border-radius: 16px; 
+      padding: 18px; 
+      backdrop-filter: blur(12px); 
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6); 
+      display: flex; 
+      flex-direction: column; 
+      gap: 12px; 
+      transition: all 0.3s ease;
+    }
+
+    .baron-card { border-color: rgba(0, 210, 255, 0.4); box-shadow: 0 0 20px rgba(0, 210, 255, 0.15); }
+    .elder-card { border-color: rgba(255, 42, 133, 0.4); box-shadow: 0 0 20px rgba(255, 42, 133, 0.15); }
+    .gold-card { border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 0 25px rgba(245, 158, 11, 0.2); }
+
+    .card-label { 
+      font-size: 0.88rem; 
+      font-weight: 800; 
+      color: var(--text-muted); 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      letter-spacing: 1px;
+    }
     
     .match-date-input {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px dashed var(--panel-border);
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(56, 189, 248, 0.4);
       color: #38bdf8;
-      font-size: 0.78rem;
-      font-weight: 600;
-      padding: 4px 8px;
-      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: 8px;
       outline: none;
       width: 100%;
       text-align: center;
+      box-shadow: inset 0 0 10px rgba(0, 210, 255, 0.1);
     }
     .match-date-input:read-only {
       background: transparent;
       border: none;
       color: #38bdf8;
       cursor: default;
+      box-shadow: none;
+      font-size: 1rem;
     }
 
-    .team-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.3); padding: 8px 12px; border-radius: 8px; border: 1px solid transparent; }
-    .team-row.winner { border-color: var(--gold-main); background: rgba(243, 156, 18, 0.15); }
+    .team-row { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      background: rgba(0, 0, 0, 0.45); 
+      padding: 12px 16px; 
+      border-radius: 10px; 
+      border: 1.5px solid transparent; 
+      min-height: 52px;
+      transition: all 0.25s ease;
+    }
+    .team-row.winner { 
+      border-color: var(--gold-main); 
+      background: linear-gradient(90deg, rgba(245, 158, 11, 0.25), rgba(0, 0, 0, 0.5)); 
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+    }
 
-    .team-name-input { background: transparent; border: none; color: var(--text-main); font-weight: 700; font-size: 0.95rem; width: 100%; outline: none; }
+    .team-name-input { 
+      background: transparent; 
+      border: none; 
+      color: var(--text-main); 
+      font-weight: 800; 
+      font-size: 1.15rem; 
+      width: 100%; 
+      outline: none; 
+    }
     .team-name-input:read-only { cursor: default; }
 
-    .score-input { width: 36px; height: 28px; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--panel-border); color: #fff; text-align: center; border-radius: 4px; font-weight: 800; font-size: 0.9rem; outline: none; }
-    .score-input:read-only { background: transparent; border: none; }
+    .score-input { 
+      width: 44px; 
+      height: 34px; 
+      background: rgba(255, 255, 255, 0.12); 
+      border: 1px solid var(--panel-border); 
+      color: #fff; 
+      text-align: center; 
+      border-radius: 6px; 
+      font-weight: 900; 
+      font-size: 1.1rem; 
+      outline: none; 
+    }
+    .score-input:read-only { background: transparent; border: none; font-size: 1.25rem; color: var(--gold-main); }
 
-    .win-btn { padding: 2px 6px; font-size: 0.7rem; border-radius: 4px; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--panel-border); color: var(--text-muted); cursor: pointer; display: none; }
+    .win-btn { 
+      padding: 4px 10px; 
+      font-size: 0.8rem; 
+      border-radius: 6px; 
+      background: rgba(255, 255, 255, 0.1); 
+      border: 1px solid var(--panel-border); 
+      color: var(--text-muted); 
+      cursor: pointer; 
+      display: none; 
+      margin-left: 8px;
+    }
     .admin-active .win-btn { display: inline-block; }
-    .win-btn.active { background: var(--gold-main); color: #000; font-weight: 800; border: none; }
+    .win-btn.active { 
+      background: var(--gold-main); 
+      color: #000; 
+      font-weight: 900; 
+      border: none; 
+      box-shadow: 0 0 10px var(--gold-glow);
+    }
 
-    .champion-box { background: linear-gradient(135deg, rgba(243, 156, 18, 0.2), rgba(0,0,0,0.6)); border: 2px solid var(--gold-main); box-shadow: 0 0 25px var(--gold-glow); text-align: center; padding: 20px; border-radius: 16px; }
-    .champion-title { font-size: 1rem; font-weight: 800; color: var(--gold-main); margin-bottom: 10px; }
-    .champion-name { font-size: 1.6rem; font-weight: 900; color: #fff; min-height: 40px; display: flex; align-items: center; justify-content: center; }
+    /* Champion Box Mega Scale */
+    .champion-box { 
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(0, 0, 0, 0.8)); 
+      border: 3px solid var(--gold-main); 
+      box-shadow: 0 0 35px var(--gold-glow); 
+      text-align: center; 
+      padding: 28px 20px; 
+      border-radius: 20px; 
+      margin-top: 10px;
+    }
+    .champion-title { font-size: 1.2rem; font-weight: 900; color: var(--gold-main); margin-bottom: 12px; letter-spacing: 2px; }
+    .champion-name { font-size: 2.2rem; font-weight: 900; color: #fff; min-height: 50px; display: flex; align-items: center; justify-content: center; text-shadow: 0 0 15px rgba(255, 255, 255, 0.8); }
 
-    @media (max-width: 900px) {
+    @media (max-width: 950px) {
+      .header-title { font-size: 2.4rem; }
       .bracket-wrapper { flex-direction: column; align-items: center; }
       .bracket-column { width: 100%; max-width: 100%; }
     }
@@ -344,9 +483,9 @@
   <div class="top-bar">
     <div class="admin-status">
       <span>상태:</span>
-      <span id="statusBadge" class="status-badge viewer">일반 시청자 (실시간 관람 중)</span>
+      <span id="statusBadge" class="status-badge viewer">일반 관람 모드 (실시간 연동 중)</span>
     </div>
-    <div style="display: flex; gap: 8px;">
+    <div style="display: flex; gap: 10px;">
       <button id="authBtn" onclick="toggleAuth()">관리자 로그인</button>
       <button onclick="copySummary()">카톡 요약 복사</button>
     </div>
@@ -361,13 +500,13 @@
     <!-- 진출팀 -->
     <div class="bracket-column">
       <div class="column-title baron-theme">바론 진출팀</div>
-      <div class="match-card">
+      <div class="match-card baron-card">
         <div class="card-label">바론 1위</div>
         <div class="team-row" id="row-b1">
           <input type="text" class="team-name-input" id="team-b1" value="바론 1위 팀" onchange="saveData()">
         </div>
       </div>
-      <div class="match-card">
+      <div class="match-card baron-card">
         <div class="card-label">바론 2위</div>
         <div class="team-row" id="row-b2">
           <input type="text" class="team-name-input" id="team-b2" value="바론 2위 팀" onchange="saveData()">
@@ -375,13 +514,13 @@
       </div>
 
       <div class="column-title elder-theme" style="margin-top: 20px;">장로 진출팀</div>
-      <div class="match-card">
+      <div class="match-card elder-card">
         <div class="card-label">장로 1위</div>
         <div class="team-row" id="row-e1">
           <input type="text" class="team-name-input" id="team-e1" value="장로 1위 팀" onchange="saveData()">
         </div>
       </div>
-      <div class="match-card">
+      <div class="match-card elder-card">
         <div class="card-label">장로 2위</div>
         <div class="team-row" id="row-e2">
           <input type="text" class="team-name-input" id="team-e2" value="장로 2위 팀" onchange="saveData()">
@@ -394,7 +533,7 @@
       <div class="column-title gold-theme">준결승 (4강)</div>
       
       <!-- 준결승 1경기 -->
-      <div class="match-card">
+      <div class="match-card gold-card">
         <div class="card-label">준결승 1경기</div>
         <input type="text" class="match-date-input" id="date-sf1" placeholder="📅 경기 날짜/시간 예고" onchange="saveData()">
         <div class="team-row" id="row-sf1-1">
@@ -410,7 +549,7 @@
       </div>
 
       <!-- 준결승 2경기 -->
-      <div class="match-card">
+      <div class="match-card gold-card">
         <div class="card-label">준결승 2경기</div>
         <input type="text" class="match-date-input" id="date-sf2" placeholder="📅 경기 날짜/시간 예고" onchange="saveData()">
         <div class="team-row" id="row-sf2-1">
@@ -429,7 +568,7 @@
     <!-- 결승전 -->
     <div class="bracket-column">
       <div class="column-title gold-theme">결승전</div>
-      <div class="match-card">
+      <div class="match-card gold-card">
         <div class="card-label">FINAL MATCH</div>
         <input type="text" class="match-date-input" id="date-f" placeholder="📅 결승전 날짜/시간 예고" onchange="saveData()">
         <div class="team-row" id="row-f-1">
@@ -445,7 +584,7 @@
       </div>
 
       <div class="champion-box">
-        <div class="champion-title">🏆 WINNER 🏆</div>
+        <div class="champion-title">🏆 CHAMPION 🏆</div>
         <div class="champion-name" id="championName">대기 중</div>
       </div>
     </div>
